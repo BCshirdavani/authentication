@@ -39,8 +39,8 @@ app.get("/", function(req, res){
     res.render("home");
 });
 
-// secret route
-app.get("/secret", function(req, res){
+// secret route - use middleware funciton "isLoggedIn" to protect access
+app.get("/secret", isLoggedIn, function(req, res){
     res.render("secret");    
 });
 
@@ -84,6 +84,20 @@ app.post("/login", passport.authenticate("local", {
 });
 
 
+//----------------------------------------  logout routes
+app.get("/logout", function(req, res){
+    req.logout();   // destroying user data in the session
+    res.redirect("/");
+});
+
+
+// this will be used to restrict access to secret page
+function isLoggedIn(req, res, next){
+    if(req.isAuthenticated()){
+        return next();
+    }
+    res.redirect("/login");
+};
 
 
 
