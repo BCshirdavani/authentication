@@ -9,6 +9,7 @@ var User                    = require("./models/user");
 
 mongoose.connect("mongodb://localhost/auth_demo_app", { useNewUrlParser: true });
 
+
 var app = express();
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
@@ -23,8 +24,9 @@ app.use(require("express-session")({
 
 app.use(passport.initialize());     // setup passport
 app.use(passport.session());
-passport.serializeUser(User.serializeUser);
-passport.deserializeUser(User.deserializeUser);
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 
 
@@ -63,6 +65,25 @@ app.post("/register", function(req, res){
         }
     });
 })
+
+
+//----------------------------------------  login routes
+
+// render login form
+app.get("/login", function(req, res){
+    console.log("logging in");
+   res.render("login"); 
+});
+
+// login logic - with middleware
+app.post("/login", passport.authenticate("local", {
+    successRedirect: "/secret",
+    failureRedirect: "/login"
+}) ,function(req, res){
+    console.log("running function in login logic route");
+});
+
+
 
 
 
