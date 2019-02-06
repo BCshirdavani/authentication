@@ -10,8 +10,20 @@ var User                    = require("./models/user");
 mongoose.connect("mongodb://localhost/auth_demo_app", { useNewUrlParser: true });
 
 var app = express();
-
 app.set('view engine', 'ejs');
+
+// setup passport
+app.use(require("express-session")({
+    secret: "Quokkas are awesome",
+    resave: false,
+    saveUninitialized: false
+}));
+
+
+app.use(passport.initialize());     // setup passport
+app.use(passport.session());
+passport.serializeUser(User.serializeUser);
+passport.deserializeUser(User.deserializeUser);
 
 
 
