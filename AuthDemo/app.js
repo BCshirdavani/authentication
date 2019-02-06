@@ -11,6 +11,7 @@ mongoose.connect("mongodb://localhost/auth_demo_app", { useNewUrlParser: true })
 
 var app = express();
 app.set('view engine', 'ejs');
+app.use(bodyParser.urlencoded({extended: true}));
 
 // setup passport
 app.use(require("express-session")({
@@ -27,7 +28,9 @@ passport.deserializeUser(User.deserializeUser);
 
 
 
-
+//===================================================
+//  ROUTES
+//===================================================
 
 // home page route
 app.get("/", function(req, res){
@@ -39,7 +42,27 @@ app.get("/secret", function(req, res){
     res.render("secret");    
 });
 
-
+//---------------------------------------- Auth Routes
+// Show sign in form
+app.get('/register', function(req, res){
+    res.render("register");
+})
+// handling user sign up
+app.post("/register", function(req, res){
+    req.body.username;
+    req.body.password;
+    User.register(new User({username: req.body.username}), req.body.password, function(error, user){
+        if(error){
+            console.log(error);
+            res.render('register')
+        }else{
+            passport.authenticate('local')(req, res, function(){
+                console.log("logged in, redirecting to secret page");
+                res.redirect('/secret');
+            })
+        }
+    });
+})
 
 
 
